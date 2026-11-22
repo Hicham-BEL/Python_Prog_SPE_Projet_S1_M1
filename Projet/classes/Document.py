@@ -23,7 +23,7 @@ class HackerNewsDocument(Document):
         super().__init__(titre, auteur, date, url, texte)
         self.id = id
         self.children = children # Id des commentaires du post
-        self.nb_commentaires = len(children)
+        self.nb_commentaires = len(children) if children is not None else 0
 
     def get_nb_commentaires(self):
         return self.nb_commentaires

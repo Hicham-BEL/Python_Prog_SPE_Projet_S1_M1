@@ -1,4 +1,5 @@
-from classes import Commentaire, Document
+from classes.Document import HackerNewsDocument
+from classes.Commentaire import CommentaireHackerNews 
 import urllib.parse
 import urllib.request
 import json
@@ -18,7 +19,7 @@ def get_json(url):
 
 
 # Met dans des listes les stories et les commentaires
-def hits_to_list(hits): 
+def hits_to_list(hits, docs, coms): 
 
     for hit in hits: # Dans un hit se trouve toutes les données qui nous intéresse
 
@@ -38,7 +39,7 @@ def hits_to_list(hits):
             commentaires = hit.get("children")
 
             # Nettoyage des balises html dans le texte
-            texte = hit.get("story_text")
+            texte = hit.get("story_text","")
             texte = html.unescape(texte).replace("<p>", " ").strip()
 
             doc = HackerNewsDocument(titre, auteur, date, url, texte, story_id, commentaires)    
@@ -63,7 +64,7 @@ def hits_to_list(hits):
 
 
 
-def requete_hacker_news(theme): # Requête l'api, max 10000 requêtes / minutes
+def requete_hacker_news(theme, docs, coms): # Requête l'api, max 10000 requêtes / minutes
 
     nb_hits_page = 1000
 
@@ -73,14 +74,14 @@ def requete_hacker_news(theme): # Requête l'api, max 10000 requêtes / minutes
     print("requete: ", url)
 
     d_hn = get_json(url)
-    print(d_hn)
+    #print(d_hn)
 
     nb_hits = d_hn["nbHits"]
     print("Nombre de hits trouvés (story + comms) : ", nb_hits)
 
     hits = d_hn["hits"]
     print("enregistrement des 1000 premiers hits")
-    hits_to_list(hits)
+    hits_to_list(hits, docs, coms)
 
     if nb_hits > 1000:
 
@@ -100,7 +101,7 @@ def requete_hacker_news(theme): # Requête l'api, max 10000 requêtes / minutes
             d_hn = get_json(nv_url)
             
             hits = d_hn["hits"]
-            hits_to_list(hits)
+            hits_to_list(hits, docs, coms)
 
             # Mettre les prints en commentaires pour gagner en perf
             #print("enregistrement jusqu'aux  ", i+1, "000ème hits")
